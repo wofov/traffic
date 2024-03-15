@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Chat</title>
+    <script>
+        var socket = new WebSocket("ws://localhost:9091/chat");
+
+        socket.onmessage = function(event) {
+            var message = event.data;
+            var chatArea = document.getElementById("chatArea");
+            chatArea.innerHTML += message + "<br>";
+        };
+
+        function sendMessage() {
+            var messageInput = document.getElementById("messageInput");
+            var message = messageInput.value;
+            socket.send(message);
+            messageInput.value = "";
+        }
+    </script>
+</head>
+<body>
+<h1>Simple Chat</h1>
+<div id="chatArea" style="height: 200px; overflow-y: scroll;"></div>
+<input type="text" id="messageInput" placeholder="Type a message...">
+<button onclick="sendMessage()">Send</button>
+</body>
+</html>

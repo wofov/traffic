@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring Boot WebSocket Chat Example</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+</head>
+<body>
+<div id="chat">
+    <input type="text" id="message" placeholder="Type a message..." />
+    <button id="sendMessage">Send</button>
+</div>
+<script th:inline="javascript">
+    var socket = new SockJS('/chat');
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/topic/public', function(messageOutput) {
+            showMessageOutput(JSON.parse(messageOutput.body));
+        });
+    });
+
+    function showMessageOutput(messageOutput) {
+        var response = $("#chat");
+        response.append("<p>" + messageOutput.sender + ": " + messageOutput.content + "</p>");
+    }
+
+    $("#sendMessage").click(function() {
+        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify({'content': $("#message").val(), 'sender': 'user'}));
+        $("#message").val('');
+    });
+</script>
+</body>
+</html>
